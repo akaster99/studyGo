@@ -20,14 +20,21 @@ func main() {
 		"https://www.instargam.com",
 		"https://academy.nomadcoder.co/",
 	}
-
+	results := make(map[string]string)
 	for _, url := range urls {
-		hitURL(url)
+		error := hitURL(url)
+		if error != nil {
+			results[url] = "fail"
+		} else {
+			results[url] = "success"
+		}
+	}
+	for url, result := range results {
+		fmt.Println(url, ": ", result)
 	}
 }
 
 func hitURL(url string) error {
-	fmt.Println("checking", url)
 	resp, error := http.Get(url)
 	if error != nil || resp.StatusCode >= 400 {
 		return errRequestFailed
