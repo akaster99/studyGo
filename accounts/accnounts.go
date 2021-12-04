@@ -8,6 +8,8 @@ type account struct {
 	balance int
 }
 
+var errNoMoney = errors.New("you don't have enough money")
+
 //NewAccount creates account
 func NewAccount(owner string) *account {
 	account := account{owner: owner, balance: 0}
@@ -24,7 +26,7 @@ func (a account) Balance() int {
 
 func (a *account) Withdraw(amount int) error {
 	if a.balance < amount {
-		return errors.New("can't withdraw you are poor")
+		return errNoMoney
 	} else {
 		a.balance -= amount
 		return nil
