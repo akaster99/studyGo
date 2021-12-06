@@ -33,13 +33,14 @@ func main() {
 	// for url, result := range results {
 	// 	fmt.Println(url, ": ", result)
 	// }
-	c := make(chan bool)
-	people := [2]string{"akaster99", "idavid29"}
+	c := make(chan string)
+	people := [5]string{"akaster99", "idavid29", "tunafish78", "lovehunt", "aqua2"}
 	for _, person := range people {
 		go isSexy(person, c)
 	}
-	result := <-c
-	fmt.Println(result)
+	for i := 0; i < len(people); i++ {
+		fmt.Println("message:", <-c)
+	}
 }
 
 func hitURL(url string) error {
@@ -50,7 +51,7 @@ func hitURL(url string) error {
 	return nil
 }
 
-func isSexy(person string, c chan bool) {
+func isSexy(person string, c chan string) {
 	time.Sleep(time.Second * 5)
-	c <- true
+	c <- person + "is Sexy"
 }
