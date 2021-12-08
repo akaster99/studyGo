@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -11,8 +12,10 @@ import (
 var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 
 func main() {
-	getPages()
-
+	pages := getPages()
+	for i := 0; i < pages; i++ {
+		getPage(i)
+	}
 }
 
 func getPages() int {
@@ -22,9 +25,12 @@ func getPages() int {
 	defer res.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
-	fmt.Println(doc.Find(".pagination"))
+	pages := 0
+	fmt.Println(doc.Find(".pagination").Each(func(i int, s *goquery.Selection) {
+		pages = s.Find("a").Length()
+	}))
 
-	return 0
+	return pages
 }
 
 func checkErr(err error) {
@@ -36,4 +42,9 @@ func checkCode(res *http.Response) {
 	if res.StatusCode != 200 {
 		log.Fatalln("Failed with Status:", res.StatusCode)
 	}
+}
+
+func getPage(page int) {
+	pageURL := baseURL + "&start=" + strconv.Itoa(page*50)
+	fmt.Println(pageURL)
 }
