@@ -4,54 +4,40 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 )
+
+type result struct {
+	url    string
+	status string
+}
 
 var errRequestFailed = errors.New("Request Failed")
 
 func main() {
-	// urls := []string{
-	// 	"https://www.airbnb.com",
-	// 	"https://www.google.com",
-	// 	"https://www.amazon.com",
-	// 	"https://www.reddit.com",
-	// 	"https://www.google.com",
-	// 	"https://soundcloud.com",
-	// 	"https://www.facebook.com",
-	// 	"https://www.instargam.com",
-	// 	"https://academy.nomadcoder.co/",
-	// }
-	// results := make(map[string]string)
-	// for _, url := range urls {
-	// 	error := hitURL(url)
-	// 	if error != nil {
-	// 		results[url] = "fail"
-	// 	} else {
-	// 		results[url] = "success"
-	// 	}
-	// }
-	// for url, result := range results {
-	// 	fmt.Println(url, ": ", result)
-	// }
-	c := make(chan string)
-	people := [5]string{"akaster99", "idavid29", "tunafish78", "lovehunt", "aqua2"}
-	for _, person := range people {
-		go isSexy(person, c)
+	c := make(chan result)
+	urls := []string{
+		"https://www.airbnb.com",
+		"https://www.google.com",
+		"https://www.amazon.com",
+		"https://www.reddit.com",
+		"https://www.google.com",
+		"https://soundcloud.com",
+		"https://www.facebook.com",
+		"https://www.instargam.com",
+		"https://academy.nomadcoder.co/",
 	}
-	for i := 0; i < len(people); i++ {
-		fmt.Println("message:", <-c)
+	results := make(map[string]string)
+	for _, url := range urls {
+		go hitURL(url, c)
 	}
 }
 
-func hitURL(url string) error {
+func hitURL(url string, c chan<- result) {
+	fmt.Println("Checking:", url)
 	resp, error := http.Get(url)
+	status := "OK"
 	if error != nil || resp.StatusCode >= 400 {
-		return errRequestFailed
+		status = "FAILED"
 	}
-	return nil
-}
-
-func isSexy(person string, c chan string) {
-	time.Sleep(time.Second * 5)
-	c <- person + "is Sexy"
+	c <- result{url: url, status: status}
 }
